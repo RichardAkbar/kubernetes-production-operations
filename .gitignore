@@ -1,0 +1,11 @@
+*.tmp
+*.log
+*.bak
+.env
+*.pem
+*.key
+kubeconfig
+admin.conf
+.DS_Store
+.idea/
+.vscode/
