@@ -1,0 +1,42 @@
+flowchart TB
+    Admin["Administrator / kubectl"]
+
+    subgraph CP["Control Plane - controlplane"]
+        API["kube-apiserver"]
+        ETCD[("etcd")]
+        SCHED["kube-scheduler"]
+        CM["kube-controller-manager"]
+    end
+
+    subgraph W1["Worker Node - node01"]
+        K1["kubelet"]
+        P1["kube-proxy"]
+        C1["containerd"]
+        POD1["Application Pods"]
+    end
+
+    subgraph W2["Worker Node - node02"]
+        K2["kubelet"]
+        P2["kube-proxy"]
+        C2["containerd"]
+        POD2["Application Pods"]
+    end
+
+    Admin --> API
+    API <--> ETCD
+    SCHED <--> API
+    CM <--> API
+    K1 <--> API
+    K2 <--> API
+
+    K1 --> C1
+    K2 --> C2
+    C1 --> POD1
+    C2 --> POD2
+
+    P1 --> POD1
+    P2 --> POD2
+
+    NET["Canal CNI<br/>Flannel VXLAN + Calico Network Policy"]
+    POD1 <--> NET
+    POD2 <--> NET
