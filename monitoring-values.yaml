@@ -1,0 +1,14 @@
+grafana:
+  persistence:
+    enabled: false
+
+prometheus:
+  prometheusSpec:
+    storageSpec: {}
+
+alertmanager:
+  alertmanagerSpec:
+    storage: {}
+
+prometheus-node-exporter:
+  enabled: false

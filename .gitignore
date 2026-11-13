@@ -1,11 +1,27 @@
+# Temporary files
 *.tmp
 *.log
 *.bak
+
+# Environment and credentials
 .env
+.env.*
 *.pem
 *.key
 kubeconfig
 admin.conf
+secrets.yaml
+secrets.yml
+
+# Kubernetes backups and database snapshots
+*.db
+*.db.*
+*.snap
+*.wal
+*.backup
+kubernetes-backups/
+
+# IDE and OS files
 .DS_Store
 .idea/
 .vscode/
