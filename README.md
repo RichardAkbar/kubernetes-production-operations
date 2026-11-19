@@ -6,19 +6,21 @@ Monitoring pada Kubernetes Multi-Node Cluster
 
 
 
-01. Gambaran Umum
+
+01. Gambaran Umum Proyek
 Kubernetes Production Operations merupakan proyek implementasi dan
 pengujian operasional Kubernetes pada lingkungan cluster multi-node.
 
-Proyek ini mencakup administrasi cluster, networking dan Container
-Network Interface (CNI), pengelolaan workload, Services dan Ingress,
-persistent storage, troubleshooting, ETCD backup dan recovery, serta
-monitoring dan observability.
+Proyek ini menerapkan praktik administrasi dan operasional Kubernetes
+yang mencakup cluster administration, networking dan Container Network
+Interface (CNI), workload management, Services dan Ingress, persistent
+storage, troubleshooting, ETCD backup dan recovery, serta monitoring dan
+observability.
 
 Implementasi dilakukan menggunakan KodeKloud Kubernetes Playground
-dengan tiga node, yaitu satu control plane dan dua worker node. Tahapan
-operasional menggunakan kubectl, Kubernetes manifests, Helm, ETCD
-tools, Prometheus, dan Grafana.
+dengan tiga node, yaitu satu control plane dan dua worker node.
+Aktivitas operasional menggunakan kubectl, Kubernetes manifests, Helm,
+ETCD tools, Prometheus, dan Grafana.
 
 Dokumentasi ini menyajikan tujuan setiap tahap, perintah implementasi
 dan pengujian, hasil yang diharapkan, hasil aktual yang tersedia, serta
@@ -36,11 +38,26 @@ Tujuan Proyek
 - Melakukan ETCD backup dan validasi offline recovery.
 - Mengimplementasikan monitoring menggunakan Prometheus dan Grafana.
 - Melakukan validasi akhir cluster.
-02. Arsitektur dan Lingkungan
+Teknologi yang Digunakan
+  Kategori                  Teknologi
+  Container Orchestration   Kubernetes v1.37.0
+Platform                  KodeKloud Kubernetes Playground
+Operating System          Ubuntu 22.04 LTS
+Container Runtime         containerd
+Networking / CNI          Canal (Calico + Flannel)
+Cluster DNS               CoreDNS
+Package Management        Helm
+Backup & Recovery         ETCD tools (etcdctl, etcdutl)
+Monitoring                Prometheus
+Visualization             Grafana
+Configuration             Kubernetes YAML Manifests
+Version Control           Git
+Repository                GitHub
+02. Arsitektur Infrastruktur
 2.1 Topologi Cluster
 Lingkungan pengujian menggunakan satu control plane dan dua worker node.
-Control plane mengelola state cluster dan komponen control plane,
-sedangkan worker node menjalankan workload aplikasi.
+Control plane bertanggung jawab mengelola state cluster dan komponen
+control plane, sedangkan worker node menjalankan workload aplikasi.
 ```mermaid
 flowchart TB
     U["Administrator<br/>kubectl / Helm"]
@@ -53,7 +70,25 @@ flowchart TB
     CP <-->|"Kubernetes API / Cluster Networking"| N2
     N1 <-->|"Pod Networking melalui Canal"| N2
 ```
-2.2 Informasi Infrastruktur
+2.2 Komponen Infrastruktur
+  Komponen                Fungsi                  Konfigurasi
+  controlplane            Mengelola control plane Ubuntu 22.04
+dan state cluster       
+
+  node01                  Menjalankan workload    Ubuntu 22.04
+aplikasi                
+
+  node02                  Menjalankan workload    Ubuntu 22.04
+aplikasi                
+
+  containerd              Menjalankan container   Container Runtime
+workload                
+
+  Canal                   Menyediakan jaringan    Calico + Flannel
+Pod                     
+CoreDNS                 Menyediakan DNS         Kubernetes DNS
+internal cluster
+2.3 Informasi Lingkungan
   Komponen            Konfigurasi
   Platform            KodeKloud Kubernetes Playground
 Kubernetes          v1.37.0
@@ -64,224 +99,140 @@ Worker Node 1       node01
 Worker Node 2       node02
 CNI                 Canal (Calico + Flannel)
 DNS                 CoreDNS
-Repository          GitHub
-2.3 Alur Implementasi
-GitHub Repository
-        |
-        v
-Kubernetes Cluster
-        |
-        v
-Cluster Administration
-        |
-        v
-Networking & CNI
-        |
-        v
-Workload Management
-        |
-        v
-Services & Ingress
-        |
-        v
-Persistent Storage
-        |
-        v
-Troubleshooting
-        |
-        v
-ETCD Backup & Recovery
-        |
-        v
-Monitoring & Observability
-        |
-        v
-Final Validation
-2.4 Dokumentasi Arsitektur
-Gambar 01 --- Arsitektur Kubernetes Multi-Node
+2.4 Alur Implementasi
+```mermaid
+flowchart TD
+    A["GitHub Repository"]
+    B["Kubernetes Cluster"]
+    C["Cluster Administration"]
+    D["Networking & CNI"]
+    E["Workload Management"]
+    F["Services & Ingress"]
+    G["Persistent Storage"]
+    H["Troubleshooting"]
+    I["ETCD Backup & Recovery"]
+    J["Monitoring & Observability"]
+    K["Final Validation"]
 
+    A --> B --> C --> D --> E --> F --> G --> H --> I --> J --> K
+```
+2.5 Dokumentasi Arsitektur
 ![alt text](1.arssssitektur.png)
 
-Diagram ini menggambarkan susunan cluster yang digunakan selama
+Diagram berikut memperlihatkan susunan cluster yang digunakan selama
 implementasi, yaitu satu control plane (controlplane) dan dua worker
 node (node01 dan node02).
 
-1.  Repository Proyek
-GitHub Repository:
-RichardAkbar/kubernetes-production-operations
-Struktur Repository
-kubernetes-production-operations/
-├── architecture/
-├── backup-recovery/
-├── manifests/
-│   └── workloads/
-├── monitoring/
-├── networking/
-├── operations/
-├── services/
-├── storage/
-├── workloads/
-├── monitoring-values.yaml
-└── README.md
-
-
-
-Verifikasi Repository
-Repository berhasil di-clone dan diverifikasi.
-git clone https://github.com/RichardAkbar/kubernetes-production-operations.git
-cd kubernetes-production-operations
-
-git status
-git log -1 --oneline
-
-
-Proses clone merupakan tahap persiapan repository sehingga tidak
-memerlukan screenshot bukti pengujian tersendiri.
-
-1.  Implementasi dan Pengujian
+1.  Implementasi Proyek
 Implementasi dibagi menjadi sepuluh tahap operasional. Setiap tahap
-memuat tujuan, perintah, hasil yang diharapkan, hasil aktual, dan bukti
-screenshot jika tersedia.
-Tahap 01 --- Validasi Kubernetes Cluster
-Tujuan
+memuat tujuan, perintah implementasi, hasil validasi, dan dokumentasi
+screenshot. Hasil aktual hanya dinyatakan berhasil apabila didukung oleh
+output pengujian yang tersedia.
+3.1 Kubernetes Cluster Validation
+Tujuan: Memastikan Kubernetes cluster berjalan normal, seluruh node
+berstatus Ready, komponen sistem aktif, dan API Server siap menerima
+request.
 
-Memastikan Kubernetes cluster berjalan normal, seluruh node berstatus
-Ready, komponen sistem aktif, dan API Server siap menerima request.
-1.1 Memeriksa Informasi Cluster
+Implementasi:
+
+Memeriksa informasi cluster:
 kubectl cluster-info
-Hasil yang diharapkan:
-- Kubernetes control plane dapat diakses.
-- CoreDNS service tersedia.
-Hasil aktual:
-- Kubernetes control plane berjalan pada https://controlplane:6443.
-- CoreDNS service tersedia.
-1.2 Memeriksa Node Kubernetes
+Memeriksa node Kubernetes:
 kubectl get nodes -o wide
-Hasil yang diharapkan:
-- Terdapat tiga node.
-- Seluruh node berstatus Ready.
-- Control plane dan worker node dapat diidentifikasi.
-Hasil aktual:
-
-  Node             Role            Status   Versi
-  controlplane   control-plane   Ready    v1.37.0
-node01         Worker          Ready    v1.37.0
-node02         Worker          Ready    v1.37.0
-1.3 Memeriksa System Pods
+Memeriksa system Pods:
 kubectl get pods -n kube-system -o wide
-Hasil yang diharapkan:
-- ETCD berstatus Running.
-- API Server berstatus Running.
-- Controller Manager berstatus Running.
-- Scheduler berstatus Running.
-- CoreDNS berstatus Running.
-- Canal dan Kube-proxy berjalan pada setiap node.
-Hasil aktual:
-
-  Komponen             Hasil
-  ETCD                 1/1 Running
-API Server           1/1 Running
-Controller Manager   1/1 Running
-Scheduler            1/1 Running
-CoreDNS              2/2 Running
-Canal                3 Pod, masing-masing 2/2 Running
-Kube-proxy           3 Pod, masing-masing 1/1 Running
-1.4 Memvalidasi API Server Readiness
+Memvalidasi API Server readiness:
 kubectl get --raw='/readyz?verbose'
-Hasil yang diharapkan:
+Hasil Validasi:
 
-Pemeriksaan readiness menunjukkan status ok, dan baris terakhir
-menunjukkan readyz check passed.
+Hasil aktual yang tersedia menunjukkan:
+- Kubernetes control plane dapat diakses melalui
+  https://controlplane:6443.
+- Terdapat tiga node: controlplane, node01, dan node02.
+- Seluruh node berstatus Ready dan menggunakan Kubernetes v1.37.0.
+- ETCD, API Server, Controller Manager, dan Scheduler berstatus
+  Running.
+- CoreDNS berjalan dengan status 2/2 Running.
+- Canal berjalan pada tiga node, masing-masing 2/2 Running.
+- Kube-proxy berjalan pada tiga node, masing-masing 1/1 Running.
+- Pemeriksaan API Server readiness berhasil dan menampilkan
+  readyz check passed.
+  Komponen               Hasil Aktual
+  controlplane           Ready
+node01                 Ready
+node02                 Ready
+ETCD                   1/1 Running
+API Server             1/1 Running
+Controller Manager     1/1 Running
+Scheduler              1/1 Running
+CoreDNS                2/2 Running
+Canal                  3 Pod, masing-masing 2/2 Running
+Kube-proxy             3 Pod, masing-masing 1/1 Running
+API Server Readiness   PASS
 
-Hasil aktual:
+<sub>{=html}Project test status: PASS untuk validasi cluster yang
+tercantum di atas.`</sub>`{=html}
 
-Seluruh pemeriksaan readiness berhasil, termasuk ping, log, ETCD, ETCD
-readiness, informer sync, dan berbagai post-start hooks.
 
-<badge color="success">{=html}PASS`</badge>`{=html} Status
-Pengujian: PASS
+![alt text](<3.cluster arsitektur.png>)
 
-Bukti Screenshot --- 01-kubernetes-cluster.png
+Gambar berikut menunjukkan hasil pemeriksaan node Kubernetes, status Pod
+pada namespace kube-system, serta output API Server readiness hingga
+baris readyz check passed.
 
-Screenshot: Letakkan screenshot yang memperlihatkan hasil kubectl get nodes -o wide, status
-Pod pada namespace kube-system, serta output API Server readiness
-hingga baris readyz check passed.
+3.2 Cluster Architecture & Administration
+Tujuan: Memeriksa arsitektur Kubernetes, fungsi node, namespace,
+system workloads, dan komponen administrasi cluster.
 
-Tahap 02 --- Cluster Architecture & Administration
-Tujuan
+Implementasi:
 
-Memeriksa arsitektur Kubernetes, fungsi node, namespace, system
-workloads, dan komponen administrasi cluster.
-2.1 Memeriksa Node dan Detail Konfigurasi
+Memeriksa node dan detail konfigurasi:
 kubectl get nodes -o wide
 kubectl describe nodes
-Hasil yang diharapkan:
-- Node dan role dapat diidentifikasi.
-- Informasi kapasitas CPU, memory, kondisi node, serta label tersedia.
-Hasil aktual:
-Lengkapi berdasarkan output pengujian aktual.
-2.2 Memeriksa Namespace
+Memeriksa namespace:
 kubectl get namespaces
-Hasil yang diharapkan:
-
-Namespace Kubernetes dapat ditampilkan, termasuk default,
-kube-system, kube-public, dan kube-node-lease.
-
-Hasil aktual:
-Lengkapi berdasarkan output pengujian aktual.
-2.3 Memeriksa Control Plane Components
+Memeriksa control plane components:
 kubectl get pods -n kube-system
-
 kubectl get pods -n kube-system -l component=kube-apiserver
 kubectl get pods -n kube-system -l component=kube-controller-manager
 kubectl get pods -n kube-system -l component=kube-scheduler
-Hasil yang diharapkan:
-
-Komponen control plane dapat ditemukan dan berjalan normal.
-
-Hasil aktual:
-Lengkapi berdasarkan output pengujian aktual.
-2.4 Memeriksa Cluster Events dan RBAC
+Memeriksa cluster events dan RBAC:
 kubectl get events -A --sort-by='.lastTimestamp'
 kubectl get serviceaccounts -A
 kubectl get clusterroles
-Hasil yang diharapkan:
+Hasil Validasi:
+- Informasi node, role, kapasitas CPU dan memory, kondisi node, serta
+  label dapat diperiksa.
+- Namespace Kubernetes dapat ditampilkan, termasuk namespace sistem.
+- Komponen control plane dapat diperiksa melalui Pod dan label
+  komponennya.
+- Informasi events, ServiceAccount, dan ClusterRole dapat diperiksa.
+Hasil aktual: Lengkapi berdasarkan output pengujian aktual.
+Screenshot yang tersedia memperlihatkan pemeriksaan arsitektur dan
+administrasi cluster, tetapi output rinci setiap perintah belum
+dicantumkan dalam dokumentasi sumber.
 
-Informasi event, ServiceAccount, dan ClusterRole dapat diperiksa.
-
-Hasil aktual:
 ![alt text](<3.cluster arsitektur.png>)
+Dokumentasi Screenshot -- Cluster Architecture & Administration
 
-memperlihatkan detail node dan konfigurasi
-cluster, daftar namespace, komponen control plane, serta resource
-administrasi cluster seperti events, ServiceAccount, dan ClusterRole.
+Gambar berikut memperlihatkan detail node dan konfigurasi cluster,
+daftar namespace, komponen control plane, serta resource administrasi
+cluster seperti events, ServiceAccount, dan ClusterRole.
 
-Tahap 03 --- Networking & CNI Validation
-Tujuan
+3.3 Kubernetes Networking & CNI Validation
+Tujuan: Memvalidasi komponen CNI Canal, alamat IP Pod, DNS
+resolution, dan konektivitas antar-Pod.
 
-Memvalidasi komponen CNI Canal, alamat IP Pod, DNS resolution, dan
-konektivitas antar-Pod.
-3.1 Memeriksa CNI Components
+Implementasi:
+
+Memeriksa CNI components:
 kubectl get pods -n kube-system -o wide
-Hasil yang diharapkan:
-
-Canal berjalan pada ketiga node.
-
-Hasil aktual:
-Lengkapi berdasarkan output pengujian aktual.
-3.2 Memeriksa IP Node dan Pod
+Memeriksa IP node dan Pod:
 kubectl get nodes -o wide
 kubectl get pods -A -o wide
-Hasil yang diharapkan:
-
-Alamat IP node dan Pod dapat ditampilkan.
-
-Hasil aktual:
-Lengkapi berdasarkan output pengujian aktual.
-3.3 Membuat Pod untuk Pengujian Jaringan
-Buat namespace pengujian:
+Membuat namespace pengujian:
 kubectl create namespace networking-lab
-Buat dua Pod BusyBox:
+Membuat dua Pod BusyBox:
 kubectl run network-test-1 \
   --image=busybox:1.36 \
   --restart=Never \
@@ -293,422 +244,466 @@ kubectl run network-test-2 \
   --restart=Never \
   -n networking-lab \
   --command -- sleep 3600
-Periksa status Pod:
+Memeriksa status Pod:
 kubectl get pods -n networking-lab -o wide
-Hasil yang diharapkan:
-
-Kedua Pod berstatus Running dan memperoleh alamat IP.
-3.4 Menguji DNS Resolution
+Menguji DNS resolution:
 kubectl exec -n networking-lab network-test-1 -- \
   nslookup kubernetes.default.svc.cluster.local
-Hasil yang diharapkan:
-
-DNS dapat menerjemahkan nama Service Kubernetes ke alamat IP internal.
-
-Hasil aktual:
-Lengkapi berdasarkan output pengujian aktual.
-3.5 Menguji Konektivitas Antar-Pod
+Menguji konektivitas antar-Pod:
 POD2_IP=$(kubectl get pod network-test-2 \
   -n networking-lab -o jsonpath='{.status.podIP}')
 
 kubectl exec -n networking-lab network-test-1 -- \
   ping -c 4 "$POD2_IP"
-Hasil yang diharapkan:
+Hasil Validasi:
+- Canal diharapkan berjalan pada ketiga node.
+- Alamat IP node dan Pod dapat ditampilkan.
+- Kedua Pod BusyBox diharapkan berstatus Running dan memperoleh
+  alamat IP.
+- DNS diharapkan dapat menerjemahkan nama Service Kubernetes.
+- Pod pertama diharapkan dapat menjangkau Pod kedua melalui alamat IP
+  internal.
+Hasil aktual: Lengkapi berdasarkan output pengujian aktual untuk
+status Pod pengujian, DNS resolution, dan konektivitas antar-Pod.
 
-Pod pertama dapat menjangkau Pod kedua melalui alamat IP internal.
-
-Hasil aktual:
 ![alt text](<4. network cni.png>)
 
-memperlihatkan status Canal Pod, alamat IP
-node dan Pod, hasil DNS resolution, serta output pengujian konektivitas
-antar-Pod.
+Gambar berikut memperlihatkan status Canal Pod, alamat IP node dan Pod,
+hasil DNS resolution, serta output pengujian konektivitas antar-Pod.
 
-Tahap 04 --- Workload Management
-Tujuan
+3.4 Kubernetes Workload Management
+Tujuan: Mengimplementasikan Deployment NGINX, memvalidasi
+ReplicaSet, health probes, resource management, dan scaling.
 
-Mengimplementasikan Deployment NGINX, memvalidasi ReplicaSet, health
-probes, resource management, dan scaling.
-4.1 Membuat Namespace
+Implementasi:
+
+Membuat namespace:
 kubectl create namespace workload-lab
-4.2 Melakukan Deployment NGINX
+Melakukan deployment NGINX:
 kubectl apply -f manifests/workloads/nginx-deployment.yaml
-4.3 Memeriksa Deployment dan ReplicaSet
+Memeriksa Deployment, ReplicaSet, dan Pod:
 kubectl get deployments -n workload-lab
 kubectl get replicasets -n workload-lab
 kubectl get pods -n workload-lab -o wide
-Hasil yang diharapkan:
-- Deployment berhasil dibuat.
-- Lima replika NGINX tersedia.
-- Pod berstatus Running dan Ready.
-Hasil aktual:
-Lengkapi berdasarkan output pengujian aktual.
-4.4 Memeriksa Konfigurasi Deployment
+Memeriksa konfigurasi Deployment:
 kubectl describe deployment nginx-deployment -n workload-lab
-Hasil yang diharapkan:
-
-Konfigurasi image, replicas, resource requests, resource limits,
-readiness probe, dan liveness probe dapat diperiksa.
-
-Hasil aktual:
-Lengkapi berdasarkan output pengujian aktual.
-4.5 Melakukan Scaling Workload
-Ubah jumlah replika menjadi tiga:
+Melakukan scaling menjadi tiga replika:
 kubectl scale deployment nginx-deployment \
   --replicas=3 -n workload-lab
-Validasi hasil scaling:
+Memvalidasi hasil scaling:
 kubectl get deployment nginx-deployment -n workload-lab
 kubectl get pods -n workload-lab
-Hasil yang diharapkan:
+Hasil Validasi:
+- Deployment NGINX diharapkan berhasil dibuat.
+- Konfigurasi awal menargetkan lima replika.
+- Pod diharapkan berstatus Running dan Ready.
+- Image, resource requests, resource limits, readiness probe, dan
+  liveness probe dapat diperiksa.
+- Setelah scaling, jumlah replika ditargetkan menjadi tiga dan
+  Deployment menunjukkan 3/3 Available.
+Hasil aktual: Belum dilengkapi pada dokumentasi sumber. Lengkapi
+berdasarkan output Deployment, ReplicaSet, Pod, dan hasil scaling.
 
-Jumlah replika berubah menjadi tiga dan Deployment menunjukkan
-3/3 Available.
 
-Hasil aktual:
-Lengkapi berdasarkan output pengujian aktual.
+Gambar berikut memperlihatkan Deployment NGINX, ReplicaSet, Pod yang
+berjalan, serta hasil perubahan jumlah replika setelah proses scaling.
 
-Status Pengujian: Belum dilengkapi
+3.5 Kubernetes Services & Ingress
+Tujuan: Mengimplementasikan Service untuk mengekspos aplikasi NGINX
+dan memvalidasi mekanisme routing trafik.
 
-Bukti Screenshot --- 04-workload-management.png
+Implementasi:
 
-Screenshot: Letakkan screenshot yang memperlihatkan Deployment NGINX, ReplicaSet,
-Pod yang berjalan, serta hasil perubahan jumlah replika setelah proses
-scaling.
-
-Tahap 05 --- Services & Ingress
-Tujuan
-
-Mengimplementasikan Service untuk mengekspos aplikasi NGINX dan
-memvalidasi mekanisme routing trafik.
-5.1 Membuat Namespace
+Membuat namespace:
 kubectl create namespace services-lab
-5.2 Memastikan Workload Memiliki Label yang Sesuai
-Periksa selector dan label Deployment sebelum membuat Service:
+Memeriksa label Pod:
 kubectl get pods -n services-lab --show-labels
-Catatan konfigurasi:
+Mengimplementasikan Service:
+kubectl apply -f services/nginx-services.yaml
+Memeriksa Service dan endpoint:
+kubectl get services -n services-lab
+kubectl get endpoints -n services-lab
+kubectl get endpointslices -n services-lab
+Memeriksa IngressClass dan Ingress Controller:
+kubectl get ingressclass
+kubectl get pods -A | grep -i ingress
+Jika Ingress Controller tersedia, terapkan manifest dan periksa
+hasilnya:
+kubectl apply -f services/nginx-ingress.yaml
+kubectl get ingress -n services-lab
+kubectl describe ingress nginx-ingress -n services-lab
+Uji HTTP routing menggunakan hostname dan alamat yang sesuai dengan
+konfigurasi aktual:
+curl -I -H "Host: <INGRESS_HOSTNAME>" http://<INGRESS_ADDRESS>
+Catatan Konfigurasi:
 
 Manifest Service yang tersedia menggunakan selector app: nginx-app,
 sedangkan manifest Deployment awal menggunakan label app: nginx.
 Keduanya perlu diselaraskan sebelum pengujian agar Service dapat
 menemukan Pod yang sesuai.
-5.3 Mengimplementasikan Service
-kubectl apply -f services/nginx-services.yaml
-5.4 Memeriksa Service dan Endpoint
-kubectl get services -n services-lab
-kubectl get endpoints -n services-lab
-kubectl get endpointslices -n services-lab
-Hasil yang diharapkan:
-- ClusterIP tersedia.
-- NodePort tersedia.
-- Endpoint mengarah ke Pod aplikasi yang benar.
+
+Ingress Controller juga harus tersedia pada environment sebelum
+pengujian routing Ingress dilakukan.
+
+Hasil Validasi:
+- ClusterIP dan NodePort diharapkan tersedia sesuai manifest.
+- Endpoint atau EndpointSlice diharapkan mengarah ke Pod aplikasi yang
+  benar.
 - LoadBalancer diuji sesuai dukungan environment.
-Hasil aktual:
-Lengkapi berdasarkan output pengujian aktual.
-5.5 Memvalidasi Ingress
-Periksa IngressClass dan Ingress Controller:
-kubectl get ingressclass
-kubectl get pods -A | grep -i ingress
-Jika Ingress Controller tersedia, terapkan manifest:
-kubectl apply -f services/nginx-ingress.yaml
-
-kubectl get ingress -n services-lab
-kubectl describe ingress nginx-ingress -n services-lab
-Uji HTTP routing menggunakan hostname dan alamat yang sesuai dengan
-konfigurasi Ingress aktual:
-# Ganti hostname sesuai konfigurasi Ingress yang digunakan.
-curl -I -H "Host: <INGRESS_HOSTNAME>" http://<INGRESS_ADDRESS>
-Hasil yang diharapkan:
-
-Request HTTP diarahkan ke Service dan aplikasi NGINX yang benar.
-
-Hasil aktual:
+- Request HTTP diharapkan diarahkan ke Service dan aplikasi NGINX yang
+  benar apabila Ingress Controller tersedia.
+Hasil aktual: Lengkapi berdasarkan output Service, Endpoint,
+EndpointSlice, Ingress, dan pengujian HTTP. Jangan menyatakan Ingress
+berhasil apabila Ingress Controller belum tersedia.
 
 ![alt text](<5. service ingresss.png>)
 
-memperlihatkan Service ClusterIP dan
-NodePort, Endpoint atau EndpointSlice, serta konfigurasi Ingress dan
-hasil HTTP routing apabila Ingress Controller tersedia pada environment.
+Gambar berikut memperlihatkan Service ClusterIP dan NodePort, Endpoint
+atau EndpointSlice, serta konfigurasi Ingress dan hasil HTTP routing
+apabila Ingress Controller tersedia pada environment.
 
-Tahap 06 --- Storage Management
-Tujuan
+3.6 Kubernetes Persistent Storage Management
+Tujuan: Mengimplementasikan persistent storage menggunakan
+PersistentVolume, PersistentVolumeClaim, dan Pod yang menggunakan volume
+tersebut.
 
-Mengimplementasikan persistent storage menggunakan PersistentVolume,
-PersistentVolumeClaim, dan Pod yang menggunakan volume tersebut.
-6.1 Menyiapkan Direktori Storage
-Konfigurasi proyek menggunakan hostPath: /mnt/k8s-storage pada node
-controlplane.
+Implementasi:
 
-Jalankan persiapan pada node yang sesuai:
+Menyiapkan direktori storage pada node yang sesuai. Konfigurasi proyek
+menggunakan hostPath: /mnt/k8s-storage pada node controlplane.
 mkdir -p /mnt/k8s-storage
 ls -ld /mnt/k8s-storage
-6.2 Membuat Namespace
+Membuat namespace:
 kubectl create namespace storage-lab
-6.3 Membuat PersistentVolume
+Membuat PersistentVolume:
 kubectl apply -f storage/persistent-volume.yaml
 kubectl get pv
-Hasil yang diharapkan:
-
-PV berhasil dibuat dan berstatus Available sebelum diklaim.
-6.4 Membuat PersistentVolumeClaim
+Membuat PersistentVolumeClaim:
 kubectl apply -f storage/persistent-volume-claim.yaml
-
 kubectl get pvc -n storage-lab
 kubectl get pv
-Hasil yang diharapkan:
-
-PVC berhasil terhubung ke PV dan berstatus Bound.
-6.5 Membuat Storage Test Pod
+Membuat Storage Test Pod:
 kubectl apply -f storage/storage-test-pod.yaml
 kubectl get pods -n storage-lab -o wide
-6.6 Memvalidasi Mount dan Data Persistence
-Tulis data ke volume:
+Menulis dan membaca data pada volume:
 kubectl exec -n storage-lab storage-test -- \
   sh -c 'echo "Kubernetes persistent storage test" > /data/test.txt'
-Periksa data:
+
 kubectl exec -n storage-lab storage-test -- cat /data/test.txt
-Hapus dan buat ulang Pod setelah memastikan PVC tetap Bound:
+Menghapus dan membuat ulang Pod:
 kubectl delete pod storage-test -n storage-lab
 kubectl apply -f storage/storage-test-pod.yaml
-Periksa kembali Pod dan data:
+
 kubectl get pods -n storage-lab
 
 kubectl exec -n storage-lab storage-test -- \
   cat /data/test.txt
-Hasil yang diharapkan:
+Hasil Validasi:
+- PV diharapkan berhasil dibuat dan berstatus Available sebelum
+  diklaim.
+- PVC diharapkan terhubung ke PV dan berstatus Bound.
+- Storage Test Pod diharapkan berhasil melakukan mount volume.
+- Data diharapkan tetap dapat dibaca setelah Pod dibuat ulang, selama
+  hostPath dan node yang digunakan tetap sama.
+Catatan Storage:
 
-Data masih dapat dibaca setelah Pod dibuat ulang, selama hostPath dan
-node yang digunakan tetap sama.
+hostPath terikat pada filesystem node tertentu. Pengujian persistence
+perlu memastikan Pod kembali menggunakan node yang sama agar hasilnya
+sesuai dengan skenario penyimpanan ini. Penggunaan hostPath pada
+proyek ini merupakan skenario lab dan bukan pengganti solusi persistent
+storage terdistribusi untuk lingkungan production.
 
-Hasil aktual:
-Lengkapi berdasarkan output pengujian aktual.
+Hasil aktual: Lengkapi berdasarkan output PV, PVC, status Pod, dan
+pembacaan data setelah Pod dibuat ulang.
 
-Catatan: hostPath terikat pada filesystem node tertentu. Pengujian
-persistence perlu memastikan Pod kembali menggunakan node yang sama agar
-hasilnya sesuai dengan skenario penyimpanan ini.
 ![alt text](<stragee managementt.png>)
 
-memperlihatkan status PV, PVC Bound,
-Storage Test Pod yang berjalan, serta hasil pembacaan data setelah Pod
-dihapus dan dibuat ulang.
+Gambar berikut memperlihatkan status PV, PVC Bound, Storage Test Pod
+yang berjalan, serta hasil pembacaan data setelah Pod dihapus dan dibuat
+ulang.
 
-Tahap 07 --- Production Troubleshooting
-Tujuan
+3.7 Production Troubleshooting
+Tujuan: Menguji kemampuan troubleshooting terhadap Pod yang
+bermasalah menggunakan logs, describe, dan events.
 
-Menguji kemampuan troubleshooting terhadap Pod yang bermasalah
-menggunakan logs, describe, dan events.
-7.1 Membuat Namespace
+Implementasi:
+
+Membuat namespace:
 kubectl create namespace troubleshooting-lab
-7.2 Mengimplementasikan Pod
+Menerapkan Pod bermasalah:
 kubectl apply -f operations/broken-pod.yaml
-7.3 Memeriksa Status Pod
+Memeriksa status dan detail Pod:
 kubectl get pods -n troubleshooting-lab -o wide
-7.4 Memeriksa Detail Pod
 kubectl describe pod broken-nginx -n troubleshooting-lab
-7.5 Memeriksa Logs
+Memeriksa logs dan events:
 kubectl logs broken-nginx -n troubleshooting-lab
-7.6 Memeriksa Events
+
 kubectl get events -n troubleshooting-lab \
   --sort-by='.lastTimestamp'
-7.7 Menguji CrashLoopBackOff
-Gunakan manifest CrashLoopBackOff yang telah disiapkan dan diverifikasi
-agar container berhenti dengan exit code bukan nol.
+Menguji CrashLoopBackOff:
 kubectl apply -f operations/crashloop-pod.yaml
 kubectl get pods -n troubleshooting-lab -w
-Periksa penyebab kegagalan:
+Memeriksa penyebab kegagalan:
 kubectl describe pod crashloop-demo -n troubleshooting-lab
 kubectl logs crashloop-demo -n troubleshooting-lab
-7.8 Melakukan Recovery
-Setelah penyebab ditemukan dan konfigurasi diperbaiki, terapkan
-konfigurasi yang telah diperbaiki dan verifikasi:
+Melakukan recovery setelah penyebab ditemukan dan konfigurasi
+diperbaiki:
 kubectl delete pod crashloop-demo -n troubleshooting-lab
 
 # Terapkan manifest hasil perbaikan sesuai file yang digunakan.
 kubectl apply -f operations/crashloop-pod.yaml
 
 kubectl get pods -n troubleshooting-lab
-Hasil yang diharapkan:
-- Penyebab kegagalan dapat diidentifikasi.
-- Logs dan events memberikan informasi untuk troubleshooting.
-- Workload dapat dipulihkan setelah konfigurasi diperbaiki.
-Hasil aktual:
+Hasil Validasi:
+- Penyebab kegagalan diharapkan dapat diidentifikasi.
+- Logs dan events diharapkan memberikan informasi untuk
+  troubleshooting.
+- Workload diharapkan dapat dipulihkan setelah konfigurasi diperbaiki.
+Hasil aktual: Lengkapi berdasarkan kondisi Pod, hasil investigasi
+describe, logs, events, dan status setelah recovery.
+
 ![alt text](<production inccident.png>)
 
+Gambar berikut memperlihatkan kondisi Pod bermasalah, output describe,
+logs dan events yang digunakan untuk investigasi, serta status Pod
+setelah recovery.
 
-memperlihatkan kondisi Pod bermasalah, output
-describe, logs dan events yang digunakan untuk investigasi, serta
-status Pod setelah recovery.
+3.8 ETCD Backup & Recovery
+Tujuan: Melakukan pemeriksaan kesehatan ETCD, pembuatan snapshot,
+verifikasi checksum, dan validasi offline restore pada direktori
+terpisah.
 
-Tahap 08 --- ETCD Backup & Recovery
-Tujuan
+Implementasi:
 
-Melakukan pemeriksaan kesehatan ETCD, pembuatan snapshot, verifikasi
-checksum, dan validasi offline restore pada direktori terpisah.
-8.1 Memeriksa ETCD Pod
+Memeriksa ETCD Pod:
 kubectl get pods -n kube-system | grep etcd
-8.2 Memeriksa ETCD Configuration
-Periksa static Pod manifest:
+Memeriksa konfigurasi ETCD pada static Pod manifest:
 cat /etc/kubernetes/manifests/etcd.yaml
-Identifikasi konfigurasi aktual berikut:
-- ETCD endpoint.
-- Lokasi etcdctl.
-- Lokasi etcdutl.
-- Certificate dan key.
-- Lokasi data directory.
-8.3 Memvalidasi ETCD Health
-Gunakan endpoint dan certificate berdasarkan konfigurasi aktual. Contoh
-berikut menggunakan placeholder yang harus diganti:
+Identifikasi endpoint ETCD, lokasi etcdctl dan etcdutl, certificate
+dan key, serta lokasi data directory berdasarkan konfigurasi aktual.
+
+Memvalidasi ETCD health. Ganti placeholder certificate dengan path
+aktual:
 ETCDCTL_API=3 etcdctl \
   --endpoints=https://127.0.0.1:2379 \
   --cacert=<CA_CERT_PATH> \
   --cert=<SERVER_CERT_PATH> \
   --key=<SERVER_KEY_PATH> \
   endpoint health
-8.4 Membuat Snapshot
+Membuat snapshot:
 ETCDCTL_API=3 etcdctl \
   --endpoints=https://127.0.0.1:2379 \
   --cacert=<CA_CERT_PATH> \
   --cert=<SERVER_CERT_PATH> \
   --key=<SERVER_KEY_PATH> \
   snapshot save /tmp/etcd-snapshot.db
-8.5 Memeriksa Snapshot
+Memeriksa snapshot dan checksum:
 ls -lh /tmp/etcd-snapshot.db
 sha256sum /tmp/etcd-snapshot.db
-8.6 Memeriksa Snapshot Status
-Gunakan etcdutl atau tool yang tersedia pada environment:
+Memeriksa status snapshot:
 etcdutl snapshot status /tmp/etcd-snapshot.db -w table
-8.7 Melakukan Offline Restore
-Restore dilakukan ke direktori terpisah dan tidak boleh menimpa data
-directory ETCD aktif.
+Melakukan offline restore ke direktori terpisah:
 etcdutl snapshot restore /tmp/etcd-snapshot.db \
   --data-dir=/tmp/etcd-restore-lab
-Periksa hasil restore:
+Memeriksa hasil restore:
 du -sh /tmp/etcd-restore-lab
-Hasil yang diharapkan:
-- ETCD health berhasil.
-- Snapshot berhasil dibuat.
-- Checksum berhasil dihitung.
+Hasil Validasi:
+- ETCD health diharapkan berhasil.
+- Snapshot diharapkan berhasil dibuat.
+- Checksum snapshot dapat dihitung.
 - Metadata snapshot dapat dibaca.
-- Offline restore berhasil pada direktori terpisah.
-- ETCD aktif tidak terganggu.
-Hasil aktual:
+- Offline restore diharapkan berhasil pada direktori terpisah.
+- Data directory ETCD aktif tidak boleh terganggu.
+Hasil aktual: Lengkapi berdasarkan output health check, snapshot
+save, checksum, snapshot status, dan offline restore. Perintah
+menggunakan placeholder certificate sehingga harus disesuaikan dengan
+konfigurasi aktual environment.
+
 ![alt text](<ettcd backup.png>)
 
-memperlihatkan hasil ETCD health check,
-proses pembuatan snapshot, snapshot status, checksum, dan keberhasilan
-offline restore pada direktori terpisah.
+Gambar berikut memperlihatkan hasil ETCD health check, proses pembuatan
+snapshot, snapshot status, checksum, dan offline restore pada direktori
+terpisah.
 
+3.9 Monitoring & Observability
+Tujuan: Mengimplementasikan Prometheus dan Grafana untuk memantau
+kondisi dan metrics Kubernetes cluster.
 
-Tahap 09 --- Monitoring & Observability
-Tujuan
+Implementasi:
 
-Mengimplementasikan Prometheus dan Grafana untuk memantau kondisi dan
-metrics Kubernetes cluster.
-9.1 Menambahkan Helm Repository
+Menambahkan Helm repository:
 helm repo add prometheus-community \
   https://prometheus-community.github.io/helm-charts
 
 helm repo update
-9.2 Membuat Namespace Monitoring
+Membuat namespace monitoring:
 kubectl create namespace monitoring
-9.3 Memeriksa Konfigurasi Monitoring
+Memeriksa konfigurasi monitoring:
 cat monitoring-values.yaml
-9.4 Menginstal Monitoring Stack
+Menginstal monitoring stack:
 helm install monitoring prometheus-community/kube-prometheus-stack \
   --namespace monitoring \
   --version 93.2.2 \
   -f monitoring-values.yaml
-9.5 Memeriksa Monitoring Components
+Memeriksa komponen monitoring:
 kubectl get pods -n monitoring
 kubectl get services -n monitoring
-9.6 Mengakses Prometheus
-Periksa nama Service Prometheus:
-kubectl get services -n monitoring
-Gunakan nama Service aktual untuk port-forward:
+Mengakses Prometheus. Gunakan nama Service aktual:
 kubectl port-forward -n monitoring \
   svc/<PROMETHEUS_SERVICE> 9090:9090
-Akses Prometheus melalui browser:
+Prometheus dapat diakses melalui http://localhost:9090.
 
-http://localhost:9090
-9.7 Memvalidasi Prometheus Targets
-Jalankan query PromQL berikut pada antarmuka Prometheus:
+Memvalidasi Prometheus targets menggunakan PromQL:
 up
 count(up == 1)
 count(up == 0)
-Hasil yang diharapkan:
-
-Target monitoring dapat dilihat beserta status UP atau DOWN. Target
-yang DOWN perlu dianalisis berdasarkan kondisi environment.
-9.8 Mengakses Grafana
-Periksa nama Service Grafana:
-kubectl get services -n monitoring
-Gunakan nama Service aktual untuk port-forward:
+Mengakses Grafana. Gunakan nama Service aktual:
 kubectl port-forward -n monitoring \
   svc/<GRAFANA_SERVICE> 3000:80
-Akses Grafana:
+Grafana dapat diakses melalui http://localhost:3000.
 
-http://localhost:3000
-9.9 Memvalidasi Dashboard
-Periksa visualisasi berikut:
+Memvalidasi dashboard:
 - CPU Usage.
 - Memory Usage.
 - Pod dan Namespace Metrics.
 - Kubernetes Cluster Overview.
 - Prometheus Targets.
-Hasil aktual:
+Hasil Validasi:
+- Pod dan Service monitoring dapat diperiksa pada namespace
+  monitoring.
+- Prometheus dapat diakses melalui port-forward jika Service tersedia.
+- Status target monitoring dapat diperiksa melalui query up.
+- Dashboard Grafana digunakan untuk menampilkan metrics Kubernetes.
+Hasil aktual: Screenshot sumber memperlihatkan halaman Prometheus
+dan dashboard Grafana. Lengkapi status Pod monitoring, hasil query
+PromQL, dan status target berdasarkan output aktual.
+
 ![alt text](prometheus.png)
+Dokumentasi Screenshot -- Prometheus Monitoring
+
+Gambar berikut memperlihatkan antarmuka Prometheus dan pemeriksaan
+metrics atau target monitoring pada Kubernetes cluster.
+
+Dokumentasi Screenshot -- Grafana Dashboard
 
 ![alt text](<dashboard grafana.png>)
 
-memperlihatkan Pod monitoring, Prometheus
-Targets, contoh query PromQL, dan dashboard Grafana yang menampilkan
-metrics Kubernetes.
+Gambar berikut memperlihatkan dashboard Grafana yang menampilkan metrics
+Kubernetes, seperti CPU Usage, Memory Usage, Pod, Namespace, dan Cluster
+Overview.
 
-Tahap 10 --- Final Validation
-Tujuan
+3.10 Final Infrastructure Validation
+Tujuan: Melakukan pemeriksaan akhir untuk memastikan cluster dan
+seluruh resource pengujian berada dalam kondisi yang sesuai.
 
-Melakukan pemeriksaan akhir untuk memastikan cluster dan seluruh
-resource pengujian berada dalam kondisi yang sesuai.
-10.1 Memeriksa Node
+Implementasi:
+
+Memeriksa node:
 kubectl get nodes -o wide
-10.2 Memeriksa Namespace
+Memeriksa namespace:
 kubectl get namespaces
-10.3 Memeriksa Seluruh Pod
+Memeriksa seluruh Pod:
 kubectl get pods -A -o wide
-10.4 Memeriksa Deployment dan Service
+Memeriksa Deployment, Service, dan Ingress:
 kubectl get deployments -A
 kubectl get services -A
 kubectl get ingress -A
-10.5 Memeriksa Storage
+Memeriksa storage:
 kubectl get pv
 kubectl get pvc -A
-10.6 Memvalidasi API Readiness
+Memvalidasi API Server readiness:
 kubectl get --raw='/readyz?verbose'
-Hasil yang diharapkan:
-- Node tetap berstatus Ready.
+Hasil Validasi:
+- Node diharapkan tetap berstatus Ready.
 - Resource pengujian berada pada status sesuai skenario.
 - Workload dan monitoring berjalan sesuai implementasi.
 - API Server tetap Ready.
-Hasil aktual:
+Hasil aktual: Lengkapi berdasarkan output final node, namespace,
+Pod, Deployment, Service, Ingress, PV, PVC, dan API Server readiness.
+
 ![alt text](final.png)
 
-memperlihatkan pemeriksaan akhir node,
-namespace, Pod, Deployment, Service, Ingress, PV, PVC, serta API Server
-readiness.
+Gambar berikut memperlihatkan pemeriksaan akhir node, namespace, Pod,
+Deployment, Service, Ingress, PV, PVC, serta API Server readiness.
 
 
-1.  Kesimpulan
-Kubernetes Production Operations dirancang sebagai implementasi praktis
-operasional Kubernetes pada cluster multi-node, mulai dari validasi
-kesehatan cluster hingga administrasi, networking, workload management,
-Services dan Ingress, persistent storage, troubleshooting, ETCD backup
-dan recovery, serta monitoring.
+RichardAkbar/kubernetes-production-operations
 
-Proyek ini memberikan pengalaman dalam menjalankan pemeriksaan dan
-operasi Kubernetes menggunakan kubectl, Kubernetes manifests, Helm,
-ETCD tools, Prometheus, dan Grafana.
+Clone repository dan periksa status Git:
+git clone https://github.com/RichardAkbar/kubernetes-production-operations.git
+cd kubernetes-production-operations
 
-Kesimpulan akhir mengenai keberhasilan seluruh implementasi harus
-didasarkan pada hasil aktual setiap tahap dan bukti pengujian yang
-tersedia. Tahap yang belum diuji atau tidak didukung oleh environment
-perlu dicatat sebagai PARTIAL atau NOT TESTED, bukan dinyatakan
-berhasil.
+git status
+git log -1 --oneline
+
+1.  Technical Skills Demonstrated
+  Area                                Implementasi
+  Kubernetes Administration           Cluster inspection, node,
+namespace, dan control plane
+
+  Container Orchestration             Deployment, ReplicaSet, Pod, dan
+scaling
+
+  Kubernetes Networking               Canal CNI, Pod networking, dan DNS
+validation
+
+  Service Exposure                    ClusterIP, NodePort, Endpoint, dan
+Ingress
+
+  Persistent Storage                  PersistentVolume,
+PersistentVolumeClaim, dan data
+persistence
+
+  Production Troubleshooting          Pod diagnostics, logs, events, dan
+recovery
+
+  Backup & Recovery                   ETCD health check, snapshot,
+checksum, dan offline restore
+
+  Monitoring & Observability          Prometheus, PromQL, Grafana, dan
+Kubernetes metrics
+
+  Infrastructure Validation           Pemeriksaan resource dan API Server
+readiness
+Version Control                     Git dan GitHub
+
+07. Kesimpulan
+Kubernetes Production Operations merupakan proyek implementasi
+praktis operasional Kubernetes pada cluster multi-node, mulai dari
+validasi kesehatan cluster hingga administrasi, networking, workload
+management, Services dan Ingress, persistent storage, troubleshooting,
+ETCD backup dan recovery, serta monitoring.
+
+Proyek ini menggunakan kubectl, Kubernetes manifests, Helm, ETCD
+tools, Prometheus, dan Grafana untuk mempraktikkan aktivitas
+administrasi dan operasional cluster.
+
+Berdasarkan bukti yang tercantum, validasi awal cluster telah berhasil
+dilakukan: ketiga node berstatus Ready, komponen sistem utama
+berjalan, dan API Server readiness menunjukkan hasil
+readyz check passed. Tahap lainnya perlu dilengkapi dengan hasil
+pengujian aktual sebelum seluruh proyek dapat dinyatakan selesai.
+
+Project Status: Initial Cluster Validation Completed; Remaining
+Operational Stages Require Result Verification.
+Catatan Operasional dan Keamanan
+- Isi bagian hasil aktual berdasarkan output terminal atau dashboard
+  yang benar-benar diperoleh.
+- Jika suatu fitur tidak didukung oleh KodeKloud Playground, tandai
+  sebagai PARTIAL atau NOT TESTED.
+- Periksa kesesuaian label Deployment dan selector Service sebelum
+  menguji endpoint.
+- Pengujian hostPath harus memperhatikan node tempat direktori
+  penyimpanan berada.
+- Pastikan konfigurasi endpoint dan certificate ETCD sesuai dengan
+  environment sebelum menjalankan perintah.
+- Jangan mengunggah private key, credential, kubeconfig sensitif, atau
+  ETCD snapshot ke repository publik.
+- Sesuaikan nama file screenshot dengan file yang benar-benar tersedia
+  di repository.
+<sub>{=html}Project: Kubernetes Production Operations`</sub>`{=html}
+
+<sub>{=html}Platform: KodeKloud Kubernetes Playground`</sub>`{=html}
+
+<sub>{=html}Repository:
+GitHub`</sub>`{=html}
