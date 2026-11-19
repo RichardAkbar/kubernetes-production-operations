@@ -684,23 +684,6 @@ berjalan, dan API Server readiness menunjukkan hasil
 readyz check passed. Tahap lainnya perlu dilengkapi dengan hasil
 pengujian aktual sebelum seluruh proyek dapat dinyatakan selesai.
 
-Project Status: Initial Cluster Validation Completed; Remaining
-Operational Stages Require Result Verification.
-Catatan Operasional dan Keamanan
-- Isi bagian hasil aktual berdasarkan output terminal atau dashboard
-  yang benar-benar diperoleh.
-- Jika suatu fitur tidak didukung oleh KodeKloud Playground, tandai
-  sebagai PARTIAL atau NOT TESTED.
-- Periksa kesesuaian label Deployment dan selector Service sebelum
-  menguji endpoint.
-- Pengujian hostPath harus memperhatikan node tempat direktori
-  penyimpanan berada.
-- Pastikan konfigurasi endpoint dan certificate ETCD sesuai dengan
-  environment sebelum menjalankan perintah.
-- Jangan mengunggah private key, credential, kubeconfig sensitif, atau
-  ETCD snapshot ke repository publik.
-- Sesuaikan nama file screenshot dengan file yang benar-benar tersedia
-  di repository.
 <sub>{=html}Project: Kubernetes Production Operations`</sub>`{=html}
 
 <sub>{=html}Platform: KodeKloud Kubernetes Playground`</sub>`{=html}
