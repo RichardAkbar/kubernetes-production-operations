@@ -531,13 +531,10 @@ Hasil yang diharapkan:
 - Logs dan events memberikan informasi untuk troubleshooting.
 - Workload dapat dipulihkan setelah konfigurasi diperbaiki.
 Hasil aktual:
-Lengkapi berdasarkan output pengujian aktual.
+![alt text](<production inccident.png>)
 
-Status Pengujian: Belum dilengkapi
 
-Bukti Screenshot --- 07-production-operations.png
-
-Screenshot: Letakkan screenshot yang memperlihatkan kondisi Pod bermasalah, output
+memperlihatkan kondisi Pod bermasalah, output
 describe, logs dan events yang digunakan untuk investigasi, serta
 status Pod setelah recovery.
 
@@ -594,19 +591,12 @@ Hasil yang diharapkan:
 - Offline restore berhasil pada direktori terpisah.
 - ETCD aktif tidak terganggu.
 Hasil aktual:
-Lengkapi berdasarkan output pengujian aktual.
+![alt text](<ettcd backup.png>)
 
-Status Pengujian: Belum dilengkapi
-
-Bukti Screenshot --- 08-etcd-backup-recovery.png
-
-Screenshot: Letakkan screenshot yang memperlihatkan hasil ETCD health check,
+memperlihatkan hasil ETCD health check,
 proses pembuatan snapshot, snapshot status, checksum, dan keberhasilan
 offline restore pada direktori terpisah.
 
-Catatan keamanan: Snapshot ETCD mengandung data sensitif cluster.
-Jangan mengunggah file snapshot, certificate, private key, atau
-credential ke repository publik.
 
 Tahap 09 --- Monitoring & Observability
 Tujuan
@@ -665,13 +655,11 @@ Periksa visualisasi berikut:
 - Kubernetes Cluster Overview.
 - Prometheus Targets.
 Hasil aktual:
-Lengkapi berdasarkan hasil Prometheus dan Grafana yang benar-benar diperoleh.
+![alt text](prometheus.png)
 
-Status Pengujian: Belum dilengkapi
+![alt text](<dashboard grafana.png>)
 
-Bukti Screenshot --- 09-monitoring-observability.png
-
-Screenshot: Letakkan screenshot yang memperlihatkan Pod monitoring, Prometheus
+memperlihatkan Pod monitoring, Prometheus
 Targets, contoh query PromQL, dan dashboard Grafana yang menampilkan
 metrics Kubernetes.
 
@@ -701,56 +689,14 @@ Hasil yang diharapkan:
 - Workload dan monitoring berjalan sesuai implementasi.
 - API Server tetap Ready.
 Hasil aktual:
-Lengkapi berdasarkan output pengujian aktual.
+![alt text](final.png)
 
-Status Pengujian: Belum dilengkapi
-
-Bukti Screenshot --- 10-final-validation.png
-
-Screenshot: Letakkan screenshot yang memperlihatkan pemeriksaan akhir node,
+memperlihatkan pemeriksaan akhir node,
 namespace, Pod, Deployment, Service, Ingress, PV, PVC, serta API Server
 readiness.
 
-05. Ringkasan Bukti Pengujian
-Tabel berikut merangkum sepuluh screenshot utama yang digunakan untuk
-mendokumentasikan tahapan implementasi.
-                No. Tahapan           Nama Screenshot                                Status
-                                                                                     berdasarkan
-                                                                                     dokumentasi
 
-                 01 Cluster           `01-kubernetes-cluster.png`                    PASS
-                    Validation                                                       
-
-                 02 Architecture &    `02-cluster-architecture-administration.png`   Belum diuji
-                    Administration                                                   
-
-                 03 Networking & CNI  `03-networking-cni.png`                        Belum diuji
-
-                 04 Workload          `04-workload-management.png`                   Belum diuji
-                    Management                                                       
-
-                 05 Services &        `05-services-ingress.png`                      Belum diuji
-                    Ingress                                                          
-
-                 06 Storage           `06-storage-management.png`                    Belum diuji
-                    Management                                                       
-
-                 07 Production        `07-production-operations.png`                 Belum diuji
-                    Troubleshooting                                                  
-
-                 08 ETCD Backup &     `08-etcd-backup-recovery.png`                  Belum diuji
-                    Recovery                                                         
-
-                 09 Monitoring &      `09-monitoring-observability.png`              Belum diuji
-                    Observability                                                    
-
-                 10 Final Validation  `10-final-validation.png`                      Belum diuji
-
-Status di atas mengikuti informasi yang tersedia pada dokumentasi
-sumber. Perbarui status setelah setiap tahap benar-benar diuji dan
-bukti screenshot tersedia.
-
-06. Kesimpulan
+1.  Kesimpulan
 Kubernetes Production Operations dirancang sebagai implementasi praktis
 operasional Kubernetes pada cluster multi-node, mulai dari validasi
 kesehatan cluster hingga administrasi, networking, workload management,
@@ -766,13 +712,3 @@ didasarkan pada hasil aktual setiap tahap dan bukti pengujian yang
 tersedia. Tahap yang belum diuji atau tidak didukung oleh environment
 perlu dicatat sebagai PARTIAL atau NOT TESTED, bukan dinyatakan
 berhasil.
-07. Informasi Repository
-GitHub Repository:
-https://github.com/RichardAkbar/kubernetes-production-operations
-
-Penyusun: Richard Jabar Akbar
-
-Platform: KodeKloud Kubernetes Playground
-
-Status Dokumentasi: Dalam proses validasi dan pelengkapan hasil
-pengujian.
